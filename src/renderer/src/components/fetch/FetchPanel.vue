@@ -36,8 +36,8 @@ function removeChip(id: string): void {
     <GlassButton
       v-if="!showInput && !store.isFetching"
       :icon="UserPlus"
-      @click="showInput = true"
       tooltip="输入 Twitter ID 批量抓取好友头像和 Bio"
+      @click="showInput = true"
     >
       添加好友
     </GlassButton>
@@ -77,16 +77,14 @@ function removeChip(id: string): void {
           <GlassButton
             primary
             :disabled="parsedIds.length === 0 || !store.isAuthenticated"
+            tooltip="通过自动抓取开始获取所有已输入的用户信息"
             @click="handleFetch"
-            tooltip="连接 X API 开始抓取所有已输入的用户信息"
           >
             开始抓取
           </GlassButton>
         </div>
 
-        <p v-if="!store.isAuthenticated" class="auth-hint">
-          ⚠️ 请先登录 Twitter 账号
-        </p>
+        <p v-if="!store.isAuthenticated" class="auth-hint">⚠️ 请先登录 Twitter 账号</p>
       </div>
     </Transition>
 
@@ -155,6 +153,7 @@ function removeChip(id: string): void {
 .id-textarea {
   resize: vertical;
   min-height: 80px;
+  max-height: 200px;
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   line-height: 1.6;
@@ -164,6 +163,8 @@ function removeChip(id: string): void {
   display: flex;
   flex-wrap: wrap;
   gap: 0.375rem;
+  max-height: 150px;
+  overflow-y: auto;
 }
 
 .chip {

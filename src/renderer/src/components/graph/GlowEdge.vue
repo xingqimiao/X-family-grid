@@ -20,8 +20,14 @@ const props = defineProps<{
   label?: string
   data?: { direction?: string }
   markerEnd?: string
-  sourceNode?: { position: { x: number; y: number }; dimensions?: { width: number; height: number } }
-  targetNode?: { position: { x: number; y: number }; dimensions?: { width: number; height: number } }
+  sourceNode?: {
+    position: { x: number; y: number }
+    dimensions?: { width: number; height: number }
+  }
+  targetNode?: {
+    position: { x: number; y: number }
+    dimensions?: { width: number; height: number }
+  }
 }>()
 
 // ── Calculate true node centers ──
@@ -58,7 +64,7 @@ const particles = computed(() => {
     { dur: '2.2s', begin: '0s', r: 2.5 },
     { dur: '2.2s', begin: '0.7s', r: 2 },
     { dur: '2.2s', begin: '1.4s', r: 1.5 },
-    { dur: '2.8s', begin: '0.3s', r: 2 },
+    { dur: '2.8s', begin: '0.3s', r: 2 }
   ]
 })
 </script>
@@ -68,12 +74,20 @@ const particles = computed(() => {
     <!-- Animated gradient for bidirectional -->
     <linearGradient :id="`grad-${id}`" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#ff7eb3">
-        <animate attributeName="stop-color"
-          values="#ff7eb3;#b388ff;#7eb3ff;#ff7eb3" dur="4s" repeatCount="indefinite" />
+        <animate
+          attributeName="stop-color"
+          values="#ff7eb3;#b388ff;#7eb3ff;#ff7eb3"
+          dur="4s"
+          repeatCount="indefinite"
+        />
       </stop>
       <stop offset="100%" stop-color="#7eb3ff">
-        <animate attributeName="stop-color"
-          values="#7eb3ff;#ff7eb3;#b388ff;#7eb3ff" dur="4s" repeatCount="indefinite" />
+        <animate
+          attributeName="stop-color"
+          values="#7eb3ff;#ff7eb3;#b388ff;#7eb3ff"
+          dur="4s"
+          repeatCount="indefinite"
+        />
       </stop>
     </linearGradient>
 
@@ -87,7 +101,8 @@ const particles = computed(() => {
 
   <!-- ═══ Layer 1: Outermost soft glow (wide, low opacity) ═══ -->
   <path
-    :d="pathD" fill="none"
+    :d="pathD"
+    fill="none"
     :stroke="isBi ? `url(#grad-${id})` : 'rgba(79, 195, 247, 0.08)'"
     :stroke-width="isBi ? 20 : 10"
     stroke-linecap="round"
@@ -96,7 +111,8 @@ const particles = computed(() => {
 
   <!-- ═══ Layer 2: Middle glow ═══ -->
   <path
-    :d="pathD" fill="none"
+    :d="pathD"
+    fill="none"
     :stroke="isBi ? `url(#grad-${id})` : 'rgba(79, 195, 247, 0.15)'"
     :stroke-width="isBi ? 10 : 5"
     stroke-linecap="round"
@@ -105,7 +121,8 @@ const particles = computed(() => {
 
   <!-- ═══ Layer 3: Inner glow ═══ -->
   <path
-    :d="pathD" fill="none"
+    :d="pathD"
+    fill="none"
     :stroke="isBi ? `url(#grad-${id})` : 'rgba(79, 195, 247, 0.3)'"
     :stroke-width="isBi ? 5 : 3"
     stroke-linecap="round"
@@ -114,7 +131,8 @@ const particles = computed(() => {
 
   <!-- ═══ Layer 4: Core visible line ═══ -->
   <path
-    :d="pathD" fill="none"
+    :d="pathD"
+    fill="none"
     :stroke="isBi ? `url(#grad-${id})` : 'rgba(79, 195, 247, 0.8)'"
     :stroke-width="isBi ? 2.5 : 1.2"
     :stroke-dasharray="isBi ? '12 4' : '6 4'"
@@ -126,19 +144,11 @@ const particles = computed(() => {
   <!-- ═══ Layer 5: Travelling spark particles ═══ -->
   <template v-for="(p, idx) in particles" :key="`particle-${id}-${idx}`">
     <!-- Glow halo around particle (larger, transparent circle) -->
-    <circle
-      :r="p.r * 4"
-      :fill="`url(#spark-${id})`"
-      :opacity="isBi ? 0.5 : 0.3"
-    >
+    <circle :r="p.r * 4" :fill="`url(#spark-${id})`" :opacity="isBi ? 0.5 : 0.3">
       <animateMotion :path="pathD" :dur="p.dur" :begin="p.begin" repeatCount="indefinite" />
     </circle>
     <!-- Bright core dot -->
-    <circle
-      :r="p.r"
-      fill="white"
-      :opacity="isBi ? 0.95 : 0.7"
-    >
+    <circle :r="p.r" fill="white" :opacity="isBi ? 0.95 : 0.7">
       <animateMotion :path="pathD" :dur="p.dur" :begin="p.begin" repeatCount="indefinite" />
     </circle>
   </template>
@@ -150,7 +160,7 @@ const particles = computed(() => {
       :style="{
         position: 'absolute',
         transform: `translate(-50%, -50%) translate(${midX}px, ${midY}px)`,
-        pointerEvents: 'none',
+        pointerEvents: 'none'
       }"
     >
       {{ label }}
@@ -171,8 +181,13 @@ const particles = computed(() => {
 }
 
 @keyframes glow-breathe {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 /* ── Core line flow animation ── */
@@ -184,14 +199,16 @@ const particles = computed(() => {
 }
 
 @keyframes glow-dash-flow {
-  to { stroke-dashoffset: -16; }
+  to {
+    stroke-dashoffset: -16;
+  }
 }
 
 /* ── Edge label glass pill ── */
 .glow-edge-label {
   background: var(--bg-glass, rgba(26, 35, 50, 0.85));
   backdrop-filter: blur(10px);
-  border: 1px solid var(--border-glass, rgba(255,255,255,0.1));
+  border: 1px solid var(--border-glass, rgba(255, 255, 255, 0.1));
   color: var(--text-primary, #e8eaf0);
   font-size: 11px;
   font-weight: 500;

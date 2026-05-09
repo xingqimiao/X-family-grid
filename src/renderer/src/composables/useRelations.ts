@@ -53,7 +53,7 @@ export function useRelations() {
       .replace(/[\s/|,;:·•\-—]+$/, '')
       .trim()
 
-    return (label.length > 0 && label.length <= 30) ? label : null
+    return label.length > 0 && label.length <= 30 ? label : null
   }
 
   /** Analyze all relationships between current people */
@@ -63,7 +63,7 @@ export function useRelations() {
     const processed = new Set<string>()
 
     // First, preserve any manual relations
-    const manualRelations = store.relations.filter(r => r.isManual)
+    const manualRelations = store.relations.filter((r) => r.isManual)
     for (const manualRel of manualRelations) {
       relations.push(manualRel)
       processed.add(manualRel.id)
@@ -115,9 +115,13 @@ export function useRelations() {
   }
 
   /** Add a manual custom relation */
-  function addCustomRelation(sourceId: string, targetId: string, direction: RelationDirection): void {
+  function addCustomRelation(
+    sourceId: string,
+    targetId: string,
+    direction: RelationDirection
+  ): void {
     const pairKey = [sourceId, targetId].sort().join('_')
-    const existing = store.relations.find(r => r.id === pairKey)
+    const existing = store.relations.find((r) => r.id === pairKey)
 
     const newRelation: Relation = {
       id: pairKey,
@@ -129,7 +133,7 @@ export function useRelations() {
     }
 
     if (existing) {
-      store.updateRelations(store.relations.map(r => r.id === pairKey ? newRelation : r))
+      store.updateRelations(store.relations.map((r) => (r.id === pairKey ? newRelation : r)))
     } else {
       store.updateRelations([...store.relations, newRelation])
     }

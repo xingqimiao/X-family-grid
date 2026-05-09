@@ -44,7 +44,6 @@ export interface ElectronAPI {
   checkAuth: () => Promise<AuthCheckResult>
   openLogin: () => Promise<AuthCheckResult>
 
-
   // Fetch
   fetchUsers: (screenNames: string[]) => Promise<FetchUserResult[]>
   onFetchProgress: (callback: (progress: FetchProgressPayload) => void) => void

@@ -24,10 +24,7 @@ const percentage = computed(() => {
       <span class="progress-percent font-mono">{{ percentage }}%</span>
     </div>
     <div class="progress-track">
-      <div
-        class="progress-fill"
-        :style="{ width: `${percentage}%` }"
-      />
+      <div class="progress-fill" :style="{ width: `${percentage}%` }" />
     </div>
   </div>
 </template>
@@ -85,7 +82,11 @@ const percentage = computed(() => {
 }
 
 @keyframes shimmer {
-  0% { background-position: 200% center; }
-  100% { background-position: -200% center; }
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
 }
 </style>

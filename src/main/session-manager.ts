@@ -88,7 +88,9 @@ export class SessionManager {
       }
 
       // Profile fetch failed, but cookies are valid — still authenticated
-      console.warn('[SessionManager] Profile fetch failed, but cookies exist — treating as authenticated')
+      console.warn(
+        '[SessionManager] Profile fetch failed, but cookies exist — treating as authenticated'
+      )
       return {
         isAuthenticated: true,
         user: {
@@ -259,7 +261,9 @@ export class SessionManager {
 
       const raw = (await response.json()) as Record<string, unknown>
       const user = (raw?.data as Record<string, unknown>)?.viewer as Record<string, unknown>
-      const user_results = (user as Record<string, unknown>)?.user_results as Record<string, unknown> | undefined
+      const user_results = (user as Record<string, unknown>)?.user_results as
+        | Record<string, unknown>
+        | undefined
       if (!user_results?.result) return null
 
       const result = user_results.result as Record<string, unknown>
@@ -269,7 +273,11 @@ export class SessionManager {
         id: (result.rest_id as string) || '',
         screenName: (legacy?.screen_name as string) || (result.screen_name as string) || '',
         name: (legacy?.name as string) || (result.name as string) || '',
-        avatarUrl: ((legacy?.profile_image_url_https as string) || (result.profile_image_url_https as string) || '').replace('_normal', '')
+        avatarUrl: (
+          (legacy?.profile_image_url_https as string) ||
+          (result.profile_image_url_https as string) ||
+          ''
+        ).replace('_normal', '')
       }
     } catch (error) {
       console.error('[SessionManager] Failed to fetch profile:', error)

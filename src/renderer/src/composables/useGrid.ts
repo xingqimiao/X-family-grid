@@ -21,7 +21,7 @@ export function useGrid() {
       const fcB = b.followersCount || 0
       return fcB - fcA
     })
-    
+
     const relations = store.relations
     const n = Math.ceil(Math.sqrt(people.length))
 
@@ -60,10 +60,10 @@ export function useGrid() {
           const placedId = placed[i]
           totalScore += scores.get(placedId)?.get(candidateId) || 0
         }
-        
+
         // Add a tiny weight for followersCount to break ties based on popularity
-        const candidatePerson = people.find(p => p.id === candidateId)
-        const followersWeight = (candidatePerson?.followersCount || 0) / 10000000 
+        const candidatePerson = people.find((p) => p.id === candidateId)
+        const followersWeight = (candidatePerson?.followersCount || 0) / 10000000
         totalScore += followersWeight
 
         if (totalScore > bestScore) {

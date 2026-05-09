@@ -6,7 +6,12 @@ import type { Relation } from '../types/relation'
 export const useAppStore = defineStore('app', () => {
   // ===== State =====
   const isAuthenticated = ref(false)
-  const currentUser = ref<{ id: string; screenName: string; name: string; avatarUrl: string } | null>(null)
+  const currentUser = ref<{
+    id: string
+    screenName: string
+    name: string
+    avatarUrl: string
+  } | null>(null)
   const people = ref<Person[]>([])
   const relations = ref<Relation[]>([])
   const gridOrder = ref<string[]>([])
@@ -71,7 +76,13 @@ export const useAppStore = defineStore('app', () => {
   }
 
   function swapGridPositions(fromIdx: number, toIdx: number): void {
-    if (fromIdx < 0 || toIdx < 0 || fromIdx >= gridOrder.value.length || toIdx >= gridOrder.value.length) return
+    if (
+      fromIdx < 0 ||
+      toIdx < 0 ||
+      fromIdx >= gridOrder.value.length ||
+      toIdx >= gridOrder.value.length
+    )
+      return
     const temp = gridOrder.value[fromIdx]
     gridOrder.value[fromIdx] = gridOrder.value[toIdx]
     gridOrder.value[toIdx] = temp
@@ -81,7 +92,10 @@ export const useAppStore = defineStore('app', () => {
     relations.value = newRelations
   }
 
-  function setAuth(auth: boolean, user?: { id: string; screenName: string; name: string; avatarUrl: string }): void {
+  function setAuth(
+    auth: boolean,
+    user?: { id: string; screenName: string; name: string; avatarUrl: string }
+  ): void {
     isAuthenticated.value = auth
     currentUser.value = user || null
   }

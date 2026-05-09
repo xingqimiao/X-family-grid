@@ -10,7 +10,7 @@ defineProps<{
 <template>
   <div class="skeleton-wrapper">
     <div
-      v-for="i in (count || 1)"
+      v-for="i in count || 1"
       :key="i"
       class="skeleton"
       :class="{ 'skeleton-circle': type === 'circle' }"

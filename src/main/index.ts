@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 import { join } from 'path'
+import fs from 'fs/promises'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { getSessionManager } from './session-manager'
@@ -102,7 +103,6 @@ function registerIpcHandlers(): void {
   // ===== File Reading =====
   ipcMain.handle('file:readBase64', async (_, filePath: string) => {
     try {
-      const fs = require('fs').promises
       const buffer = await fs.readFile(filePath)
       // Determine mime type from extension
       const ext = filePath.split('.').pop()?.toLowerCase() || 'jpeg'

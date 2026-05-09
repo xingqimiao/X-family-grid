@@ -34,7 +34,10 @@ defineProps<{
   text-align: center;
   padding: 0.5rem;
 }
-.ghost-icon { font-size: 1.25rem; opacity: 0.5; }
+.ghost-icon {
+  font-size: 1.25rem;
+  opacity: 0.5;
+}
 .ghost-text {
   font-size: 0.625rem;
   color: var(--text-muted);

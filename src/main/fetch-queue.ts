@@ -3,7 +3,13 @@ import { getFileManager } from './file-manager'
 import type { PersonData } from '../renderer/src/types/person'
 
 export interface QueueCallbacks {
-  onProgress: (current: number, total: number, screenName: string, status: string, error?: string) => void
+  onProgress: (
+    current: number,
+    total: number,
+    screenName: string,
+    status: string,
+    error?: string
+  ) => void
   onComplete: (results: Array<{ success: boolean; person?: PersonData; error?: string }>) => void
 }
 
@@ -25,7 +31,9 @@ export class FetchQueue {
     }
 
     // Deduplicate
-    const unique = [...new Set(screenNames.map((s) => s.trim().replace(/^@/, '').toLowerCase()))].filter(Boolean)
+    const unique = [
+      ...new Set(screenNames.map((s) => s.trim().replace(/^@/, '').toLowerCase()))
+    ].filter(Boolean)
 
     if (unique.length === 0) {
       callbacks.onComplete([])
@@ -62,7 +70,10 @@ export class FetchQueue {
                   person.localAvatarPath = savedPath
                 }
               } catch (dlErr) {
-                console.warn(`[FetchQueue] Avatar download failed for @${screenName}, continuing:`, dlErr)
+                console.warn(
+                  `[FetchQueue] Avatar download failed for @${screenName}, continuing:`,
+                  dlErr
+                )
               }
             }
 
@@ -85,7 +96,9 @@ export class FetchQueue {
       // ALWAYS reset state and call onComplete, even on unexpected errors
       this.isProcessing = false
       this.queue = []
-      console.log(`[FetchQueue] Complete: ${results.filter((r) => r.success).length}/${results.length} succeeded`)
+      console.log(
+        `[FetchQueue] Complete: ${results.filter((r) => r.success).length}/${results.length} succeeded`
+      )
       callbacks.onComplete(results)
     }
   }

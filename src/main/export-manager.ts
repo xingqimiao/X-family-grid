@@ -6,10 +6,7 @@ import { promises as fs } from 'fs'
  */
 export class ExportManager {
   /** Show save dialog and write the exported image */
-  async saveExportedImage(
-    parentWindow: BrowserWindow,
-    dataUrl: string
-  ): Promise<string | null> {
+  async saveExportedImage(parentWindow: BrowserWindow, dataUrl: string): Promise<string | null> {
     const { filePath, canceled } = await dialog.showSaveDialog(parentWindow, {
       title: '导出拼图',
       defaultPath: `X-Family-Grid_${new Date().toISOString().slice(0, 10)}.png`,

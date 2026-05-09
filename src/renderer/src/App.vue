@@ -21,11 +21,14 @@ const { runAnalysis } = useRelations()
 const isReady = ref(false)
 
 // Auto-run relation analysis when people change
-watch(() => store.people.length, (newLen, oldLen) => {
-  if (newLen > 0 && newLen !== oldLen) {
-    runAnalysis()
+watch(
+  () => store.people.length,
+  (newLen, oldLen) => {
+    if (newLen > 0 && newLen !== oldLen) {
+      runAnalysis()
+    }
   }
-})
+)
 
 onMounted(async () => {
   try {
@@ -81,14 +84,10 @@ onMounted(async () => {
           </GlassCard>
 
           <!-- People list -->
-          <GlassCard v-if="store.people.length > 0" :hoverable="false" padding="1rem">
+          <GlassCard v-if="store.people.length > 0" :hoverable="false" padding="1rem" class="people-card">
             <h3 class="sidebar-title">大家庭成员</h3>
             <div class="people-list">
-              <div
-                v-for="person in store.people"
-                :key="person.id"
-                class="person-item"
-              >
+              <div v-for="person in store.people" :key="person.id" class="person-item">
                 <img
                   v-if="person.avatarUrl"
                   :src="person.avatarUrl"
@@ -146,7 +145,6 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  overflow-y: auto;
   padding-right: 0.25rem;
 }
 
@@ -163,10 +161,20 @@ onMounted(async () => {
   margin-bottom: 0.75rem;
 }
 
+.people-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .people-list {
   display: flex;
   flex-direction: column;
   gap: 0.375rem;
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.25rem;
 }
 
 .person-item {

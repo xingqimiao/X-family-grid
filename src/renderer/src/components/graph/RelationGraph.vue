@@ -20,6 +20,7 @@ const { runAnalysis, removeRelationsForPerson } = useRelations()
 const { startFetch } = useFetch()
 
 // Register custom edge type
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const edgeTypes: Record<string, any> = { glow: GlowEdge }
 
 /**
@@ -30,8 +31,8 @@ const nodePositions = computed(() => {
   const positions = new Map<string, { x: number; y: number }>()
   const placed = new Set<string>()
 
-  const COL_W = 250  // horizontal spacing (wider for glow room)
-  const ROW_H = 220  // vertical spacing
+  const COL_W = 250 // horizontal spacing (wider for glow room)
+  const ROW_H = 220 // vertical spacing
   let currentRow = 0
 
   // 1. Group related pairs on the same row
@@ -58,7 +59,7 @@ const nodePositions = computed(() => {
   }
 
   // 2. Place remaining unconnected nodes in a row below
-  const unplaced = store.people.filter(p => !placed.has(p.id))
+  const unplaced = store.people.filter((p) => !placed.has(p.id))
   unplaced.forEach((person, i) => {
     positions.set(person.id, { x: i * COL_W, y: currentRow * ROW_H })
   })
@@ -103,7 +104,7 @@ const edges = computed(() => {
       type: 'glow',
       data: { direction: rel.direction },
       label,
-      markerEnd: rel.direction === 'unidirectional' ? 'arrowclosed' : undefined,
+      markerEnd: rel.direction === 'unidirectional' ? 'arrowclosed' : undefined
     }
   })
 })
@@ -128,7 +129,10 @@ function onNodeContextMenu(event: any): void {
   activePerson.value = event.node.data.person
   menuPos.value = { x: event.event.clientX, y: event.event.clientY }
   showMenu.value = true
-  const close = () => { showMenu.value = false; window.removeEventListener('click', close) }
+  const close = (): void => {
+    showMenu.value = false
+    window.removeEventListener('click', close)
+  }
   setTimeout(() => window.addEventListener('click', close), 0)
 }
 
@@ -157,10 +161,18 @@ function refetchUser(): void {
   <div class="relation-graph">
     <div class="graph-toolbar">
       <div style="display: flex; gap: 0.5rem">
-        <GlassButton :icon="Plus" @click="showAddModal = true" tooltip="手动添加两个人之间的关系连线">
+        <GlassButton
+          :icon="Plus"
+          tooltip="手动添加两个人之间的关系连线"
+          @click="showAddModal = true"
+        >
           添加自定义关系
         </GlassButton>
-        <GlassButton :icon="RefreshCw" @click="handleAnalyze" tooltip="重新扫描所有人的 Bio，自动发现 @提及关系">
+        <GlassButton
+          :icon="RefreshCw"
+          tooltip="重新扫描所有人的 Bio，自动发现 @提及关系"
+          @click="handleAnalyze"
+        >
           重新分析关系
         </GlassButton>
       </div>
@@ -179,11 +191,7 @@ function refetchUser(): void {
       >
         <template #node-default="{ data }">
           <div class="graph-node bounce-in">
-            <img
-              v-if="data.person.avatarUrl"
-              :src="data.person.avatarUrl"
-              class="node-avatar"
-            />
+            <img v-if="data.person.avatarUrl" :src="data.person.avatarUrl" class="node-avatar" />
             <div v-else class="node-avatar-placeholder">
               {{ data.person.name?.charAt(0) }}
             </div>
@@ -211,12 +219,8 @@ function refetchUser(): void {
         <div class="glass-context-item" @click="refetchUser">
           <RefreshCw :size="14" /> 重新抓取该用户
         </div>
-        <div class="glass-context-item" @click="copyBio">
-          <Copy :size="14" /> 复制 Bio 文本
-        </div>
-        <div class="glass-context-item" @click="unlinkAll">
-          <Unlink :size="14" /> 解除所有关系
-        </div>
+        <div class="glass-context-item" @click="copyBio"><Copy :size="14" /> 复制 Bio 文本</div>
+        <div class="glass-context-item" @click="unlinkAll"><Unlink :size="14" /> 解除所有关系</div>
         <div class="glass-context-separator" />
         <div class="glass-context-item glass-context-item--danger" @click="removePerson">
           <Trash2 :size="14" /> 从项目中移除
@@ -236,7 +240,9 @@ function refetchUser(): void {
   gap: 1rem;
   height: 100%;
 }
-.graph-toolbar { flex-shrink: 0; }
+.graph-toolbar {
+  flex-shrink: 0;
+}
 .graph-container {
   flex: 1;
   border-radius: var(--radius-xl);
@@ -246,7 +252,10 @@ function refetchUser(): void {
   border: 1px solid var(--border-glass);
   min-height: 400px;
 }
-.vue-flow-wrapper { width: 100%; height: 100%; }
+.vue-flow-wrapper {
+  width: 100%;
+  height: 100%;
+}
 .graph-node {
   display: flex;
   flex-direction: column;

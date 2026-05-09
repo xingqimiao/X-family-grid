@@ -11,7 +11,13 @@ export function useFetch() {
   function parseIds(rawInput: string): string[] {
     return rawInput
       .split(/[\n,;\s]+/)
-      .map((s) => s.trim().replace(/^@/, '').replace(/https?:\/\/(x|twitter)\.com\//, '').replace(/\/.*$/, ''))
+      .map((s) =>
+        s
+          .trim()
+          .replace(/^@/, '')
+          .replace(/https?:\/\/(x|twitter)\.com\//, '')
+          .replace(/\/.*$/, '')
+      )
       .filter(Boolean)
       .filter((v, i, a) => a.indexOf(v) === i) // deduplicate
   }
@@ -37,11 +43,16 @@ export function useFetch() {
     try {
       const results = await window.api.fetchUsers(screenNames)
 
-      console.log('[useFetch] Fetch results:', JSON.stringify(results?.map((r) => ({
-        success: r.success,
-        name: r.person?.name,
-        error: r.error
-      }))))
+      console.log(
+        '[useFetch] Fetch results:',
+        JSON.stringify(
+          results?.map((r) => ({
+            success: r.success,
+            name: r.person?.name,
+            error: r.error
+          }))
+        )
+      )
 
       // Collect successful results
       const newPeople: PersonData[] = (results || [])

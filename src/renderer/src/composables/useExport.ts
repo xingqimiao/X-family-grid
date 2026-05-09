@@ -47,7 +47,7 @@ export function useExport() {
         maxWidth: gridElement.style.maxWidth,
         overflow: gridElement.style.overflow,
         aspectRatio: gridElement.style.aspectRatio,
-        height: gridElement.style.height,
+        height: gridElement.style.height
       }
 
       gridElement.style.maxHeight = 'none'
@@ -57,7 +57,7 @@ export function useExport() {
       gridElement.style.height = 'auto'
 
       // Give browser a frame to reflow
-      await new Promise(r => requestAnimationFrame(r))
+      await new Promise((r) => requestAnimationFrame(r))
 
       const w = gridElement.scrollWidth
       const h = gridElement.scrollHeight

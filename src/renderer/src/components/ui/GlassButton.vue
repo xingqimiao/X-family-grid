@@ -52,7 +52,11 @@ function onMouseLeave() {
 
   <Teleport to="body">
     <Transition name="tooltip-fade">
-      <span v-if="tooltip && showTooltip" class="glass-tooltip teleported-tooltip" :style="tooltipStyle">
+      <span
+        v-if="tooltip && showTooltip"
+        class="glass-tooltip teleported-tooltip"
+        :style="tooltipStyle"
+      >
         {{ tooltip }}
       </span>
     </Transition>
@@ -67,14 +71,16 @@ function onMouseLeave() {
   background: rgba(26, 35, 50, 0.92);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #e8eaf0;
   font-size: 0.6875rem;
   font-weight: 400;
   line-height: 1.4;
   white-space: nowrap;
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2), 0 0 8px rgba(79, 195, 247, 0.08);
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 0 8px rgba(79, 195, 247, 0.08);
   pointer-events: none;
   z-index: 99999;
 }
@@ -86,12 +92,14 @@ function onMouseLeave() {
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-bottom-color: rgba(255,255,255,0.1);
+  border-bottom-color: rgba(255, 255, 255, 0.1);
 }
 
 .tooltip-fade-enter-active,
 .tooltip-fade-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .tooltip-fade-enter-from,

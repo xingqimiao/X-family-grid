@@ -41,6 +41,8 @@ defineEmits<{
 }
 
 html.dark .login-btn {
-  box-shadow: 0 0 15px rgba(255, 107, 157, 0.4), 0 0 30px rgba(79, 195, 247, 0.2);
+  box-shadow:
+    0 0 15px rgba(255, 107, 157, 0.4),
+    0 0 30px rgba(79, 195, 247, 0.2);
 }
 </style>

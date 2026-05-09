@@ -16,11 +16,14 @@ const gridRef = ref<HTMLElement | null>(null)
 const dragFromIdx = ref<number | null>(null)
 const dragOverIdx = ref<number | null>(null)
 
-watch(() => store.relations.length, () => {
-  if (store.relations.length > 0 && store.gridOrder.length === 0) {
-    initialSort()
+watch(
+  () => store.relations.length,
+  () => {
+    if (store.relations.length > 0 && store.gridOrder.length === 0) {
+      initialSort()
+    }
   }
-})
+)
 
 function onDragStart(index: number, event: DragEvent): void {
   dragFromIdx.value = index
@@ -57,27 +60,27 @@ function onDragEnd(): void {
 async function handleExport(): Promise<void> {
   if (!gridRef.value) return
   // If it's a TransitionGroup, gridRef.value might be the component instance. We need the $el.
-  const el = (gridRef.value as any).$el || gridRef.value
+  const el = (gridRef.value as { $el?: HTMLElement }).$el || gridRef.value
   await exportGrid(el)
 }
 
 const hoverLines = computed(() => {
   if (!store.hoveredPersonId) return []
-  const hoveredIdx = orderedPeople.value.findIndex(p => p.id === store.hoveredPersonId)
+  const hoveredIdx = orderedPeople.value.findIndex((p) => p.id === store.hoveredPersonId)
   if (hoveredIdx === -1) return []
 
   const n = gridSize.value || 1
-  const getCenter = (idx: number) => ({
-    x: ((idx % n) + 0.5) / n * 100,
-    y: (Math.floor(idx / n) + 0.5) / n * 100
+  const getCenter = (idx: number): { x: number; y: number } => ({
+    x: (((idx % n) + 0.5) / n) * 100,
+    y: ((Math.floor(idx / n) + 0.5) / n) * 100
   })
 
   const start = getCenter(hoveredIdx)
-  const lines: { x1: number, y1: number, x2: number, y2: number, key: string }[] = []
+  const lines: { x1: number; y1: number; x2: number; y2: number; key: string }[] = []
 
   const related = store.getRelatedPeople(store.hoveredPersonId)
-  related.forEach(targetId => {
-    const targetIdx = orderedPeople.value.findIndex(p => p.id === targetId)
+  related.forEach((targetId) => {
+    const targetIdx = orderedPeople.value.findIndex((p) => p.id === targetId)
     if (targetIdx !== -1) {
       const end = getCenter(targetIdx)
       lines.push({ x1: start.x, y1: start.y, x2: end.x, y2: end.y, key: targetId })
@@ -89,13 +92,24 @@ const hoverLines = computed(() => {
 
 <template>
   <div class="avatar-grid-wrapper">
-    <div class="grid-toolbar" v-if="store.people.length > 0">
-      <span class="font-mono" style="font-size:0.8125rem; color: var(--text-muted)">
+    <div v-if="store.people.length > 0" class="grid-toolbar">
+      <span class="font-mono" style="font-size: 0.8125rem; color: var(--text-muted)">
         {{ store.people.length }} 人 · {{ gridSize }}×{{ gridSize }}
       </span>
-      <div style="display:flex; gap:0.5rem">
-        <GlassButton :icon="Wand2" @click="initialSort()" tooltip="按粉丝数和亲密关系自动排列头像位置">智能排列</GlassButton>
-        <GlassButton primary :icon="Download" :loading="isExporting" @click="handleExport" tooltip="将当前拼图导出为高清 PNG 图片">
+      <div style="display: flex; gap: 0.5rem">
+        <GlassButton
+          :icon="Wand2"
+          tooltip="按粉丝数和亲密关系自动排列头像位置"
+          @click="initialSort()"
+          >智能排列</GlassButton
+        >
+        <GlassButton
+          primary
+          :icon="Download"
+          :loading="isExporting"
+          tooltip="将当前拼图导出为高清 PNG 图片"
+          @click="handleExport"
+        >
           导出拼图
         </GlassButton>
       </div>
@@ -103,9 +117,9 @@ const hoverLines = computed(() => {
 
     <TransitionGroup
       v-if="store.people.length > 0"
+      ref="gridRef"
       name="grid-anim"
       tag="div"
-      ref="gridRef"
       class="avatar-grid relative"
       :style="{
         gridTemplateColumns: `repeat(${gridSize}, 1fr)`,
@@ -119,12 +133,16 @@ const hoverLines = computed(() => {
         :index="index"
         :is-dragging="dragFromIdx === index"
         :is-drag-over="dragOverIdx === index"
-        :is-dimmed="store.hoveredPersonId !== null
-          && store.hoveredPersonId !== person.id
-          && !store.getRelatedPeople(store.hoveredPersonId).has(person.id)"
-        :is-highlighted="store.hoveredPersonId !== null
-          && (store.hoveredPersonId === person.id
-            || store.getRelatedPeople(store.hoveredPersonId).has(person.id))"
+        :is-dimmed="
+          store.hoveredPersonId !== null &&
+          store.hoveredPersonId !== person.id &&
+          !store.getRelatedPeople(store.hoveredPersonId).has(person.id)
+        "
+        :is-highlighted="
+          store.hoveredPersonId !== null &&
+          (store.hoveredPersonId === person.id ||
+            store.getRelatedPeople(store.hoveredPersonId).has(person.id))
+        "
         draggable="true"
         @dragstart="onDragStart(index, $event)"
         @dragover="onDragOver(index, $event)"
@@ -141,7 +159,7 @@ const hoverLines = computed(() => {
         :remaining="emptySlots - i + 1"
         :total-empty="emptySlots"
       />
-      
+
       <!-- Electric lines overlay -->
       <svg
         v-if="hoverLines.length > 0"
@@ -163,11 +181,18 @@ const hoverLines = computed(() => {
     </TransitionGroup>
 
     <div v-else class="empty-state">
-      <div class="floating" style="font-size:3rem; margin-bottom:1rem">✨</div>
-      <h3 style="font-size:1.25rem; font-weight:600; color:var(--text-primary); margin-bottom:0.5rem">
+      <div class="floating" style="font-size: 3rem; margin-bottom: 1rem">✨</div>
+      <h3
+        style="
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: var(--text-primary);
+          margin-bottom: 0.5rem;
+        "
+      >
         还没有小伙伴
       </h3>
-      <p style="font-size:0.875rem; color:var(--text-muted); max-width:300px">
+      <p style="font-size: 0.875rem; color: var(--text-muted); max-width: 300px">
         登录 Twitter 并添加好友 ID，开始创建你的大家庭拼图
       </p>
     </div>

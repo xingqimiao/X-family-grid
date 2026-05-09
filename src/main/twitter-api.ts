@@ -75,7 +75,9 @@ export class TwitterApi {
 
       if (!response.ok) {
         const body = await response.text().catch(() => '')
-        console.error(`[TwitterApi] HTTP ${response.status} for @${screenName}: ${body.slice(0, 300)}`)
+        console.error(
+          `[TwitterApi] HTTP ${response.status} for @${screenName}: ${body.slice(0, 300)}`
+        )
         return null
       }
 
@@ -128,12 +130,12 @@ export class TwitterApi {
       const name = legacy?.name || result.name || screenName
       const bio = legacy?.description || result.description || ''
       const followersCount = legacy?.followers_count || result.followers_count || 0
-      const avatarRaw =
-        legacy?.profile_image_url_https ||
-        result.profile_image_url_https ||
-        ''
+      const avatarRaw = legacy?.profile_image_url_https || result.profile_image_url_https || ''
 
-      const avatarUrl = avatarRaw.replace(/_(normal|bigger|mini|reasonably_small|200x200|400x400)/, '')
+      const avatarUrl = avatarRaw.replace(
+        /_(normal|bigger|mini|reasonably_small|200x200|400x400)/,
+        ''
+      )
 
       if (!restId && !screenName) {
         console.warn('[TwitterApi] Could not extract user identifier')

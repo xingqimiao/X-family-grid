@@ -6,7 +6,7 @@ import GlassButton from '../ui/GlassButton.vue'
 import { X } from 'lucide-vue-next'
 import type { RelationDirection } from '../../types/relation'
 
-const props = defineProps<{
+defineProps<{
   show: boolean
 }>()
 
@@ -29,7 +29,7 @@ const isValid = computed(() => {
   return sourceId.value && targetId.value && sourceId.value !== targetId.value
 })
 
-function handleSave() {
+function handleSave(): void {
   if (isValid.value) {
     addCustomRelation(sourceId.value, targetId.value, direction.value)
     sourceId.value = ''
@@ -65,7 +65,12 @@ function handleSave() {
             <label>人员 B</label>
             <select v-model="targetId" class="glass-select">
               <option value="" disabled>选择人员</option>
-              <option v-for="person in sortedPeople" :key="person.id" :value="person.id" :disabled="person.id === sourceId">
+              <option
+                v-for="person in sortedPeople"
+                :key="person.id"
+                :value="person.id"
+                :disabled="person.id === sourceId"
+              >
                 {{ person.name }} (@{{ person.screenName }})
               </option>
             </select>
