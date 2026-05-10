@@ -43,6 +43,7 @@ export interface ElectronAPI {
   // Auth
   checkAuth: () => Promise<AuthCheckResult>
   openLogin: () => Promise<AuthCheckResult>
+  logout: () => Promise<void>
 
   // Fetch
   fetchUsers: (screenNames: string[]) => Promise<FetchUserResult[]>

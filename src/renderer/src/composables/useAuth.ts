@@ -33,8 +33,13 @@ export function useAuth() {
     }
   }
 
-  /** Clear session */
-  function logout(): void {
+  /** Clear session (cookies + local state) */
+  async function logout(): Promise<void> {
+    try {
+      await window.api.logout()
+    } catch (error) {
+      console.error('[useAuth] Logout failed:', error)
+    }
     store.setAuth(false)
   }
 

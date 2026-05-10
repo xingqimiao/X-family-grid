@@ -31,6 +31,7 @@ export interface AuthUser {
 export class SessionManager {
   private loginWindow: BrowserWindow | null = null
   private _isAuthenticated = false
+  private _pendingFinish: (() => void) | null = null
 
   /** Get the Twitter-specific session */
   getSession(): Electron.Session {
@@ -143,37 +144,109 @@ export class SessionManager {
       this.loginWindow = null
     })
 
+    // Set Chrome User-Agent to prevent Google/Apple from blocking Electron
+    this.loginWindow.webContents.userAgent = CHROME_UA
+
+    // ===== Handle OAuth popups (Google, Apple, etc.) =====
+    // Allow popups as proper child windows so that window.opener
+    // communication (used by Google/Apple OAuth) works correctly.
+    // Use the same Twitter partition so auth cookies land in the right session.
+    this.loginWindow.webContents.setWindowOpenHandler(({ url }) => {
+      console.log('[SessionManager] Allowing OAuth popup:', url)
+      return {
+        action: 'allow',
+        overrideBrowserWindowOptions: {
+          autoHideMenuBar: true,
+          webPreferences: {
+            partition: TWITTER_PARTITION,
+            nodeIntegration: false,
+            contextIsolation: true
+          }
+        }
+      }
+    })
+
+    // Set Chrome UA on any child windows too (e.g. Google OAuth popup)
+    // Also monitor child window closing to trigger auth re-check
+    this.loginWindow.webContents.on('did-create-window', (childWindow) => {
+      childWindow.webContents.userAgent = CHROME_UA
+      console.log('[SessionManager] OAuth child window created')
+
+      childWindow.on('closed', () => {
+        console.log('[SessionManager] OAuth child window closed, will re-check auth...')
+        // After OAuth popup closes, the login page processes the result.
+        // Give it time to set cookies, then poll for auth.
+        this.pollForAuth()
+      })
+    })
+
     await this.loginWindow.loadURL('https://x.com/i/flow/login')
 
-    // Watch for successful login — user lands on home page
+    // Watch for successful login
     return new Promise<void>((resolve) => {
       let resolved = false
 
       const finish = (): void => {
         if (resolved) return
         resolved = true
+        // Remove cookie listener on finish
+        this.getSession().cookies.removeListener('changed', onCookieChange)
         resolve()
       }
+
+      // Store finish on instance so pollForAuth can access it
+      this._pendingFinish = finish
 
       const checkNavigation = async (url: string): Promise<void> => {
         if (resolved) return
 
+        console.log('[SessionManager] Navigation:', url)
+
+        // Only match definitive home page URLs (not intermediate OAuth redirects)
         const isHomePage =
-          url.includes('x.com/home') ||
+          url === 'https://x.com/home' ||
+          url.startsWith('https://x.com/home?') ||
+          url.startsWith('https://x.com/home/') ||
           url === 'https://x.com/' ||
-          url === 'https://x.com' ||
-          (url.startsWith('https://x.com') && !url.includes('/i/flow/login'))
+          url === 'https://x.com'
 
         if (isHomePage) {
-          console.log('[SessionManager] Detected home page navigation, closing login window')
+          // Don't trust URL alone — verify cookies actually exist
+          const creds = await this.getFreshCredentials()
+          if (creds) {
+            console.log('[SessionManager] Home page + valid cookies confirmed — login success')
+            setTimeout(() => {
+              if (this.loginWindow && !this.loginWindow.isDestroyed()) {
+                this.loginWindow.close()
+              }
+            }, 600)
+            finish()
+          } else {
+            console.log('[SessionManager] Home page detected but no cookies yet — waiting...')
+          }
+        }
+      }
+
+      // Fallback: detect auth_token cookie being set (covers edge cases
+      // where navigation events don't fire, e.g. SPA redirects after OAuth)
+      const onCookieChange = (
+        _event: Electron.Event,
+        cookie: Electron.Cookie,
+        cause: 'explicit' | 'overwrite' | 'expired' | 'evicted' | 'expired-overwrite',
+        removed: boolean
+      ): void => {
+        if (resolved) return
+        if (cookie.name === 'auth_token' && !removed && cookie.domain?.includes('x.com')) {
+          console.log(`[SessionManager] auth_token cookie set (cause: ${cause}) — login successful`)
           setTimeout(() => {
             if (this.loginWindow && !this.loginWindow.isDestroyed()) {
               this.loginWindow.close()
             }
-          }, 600)
+          }, 1500) // Give X a moment to finish setting all cookies
           finish()
         }
       }
+      this.getSession().cookies.on('changed', onCookieChange)
 
       this.loginWindow!.webContents.on('did-navigate', (_, url) => {
         checkNavigation(url)
@@ -184,8 +257,50 @@ export class SessionManager {
       })
 
       // Handle window closed manually
-      this.loginWindow!.on('closed', () => finish())
+      this.loginWindow!.on('closed', () => {
+        this._pendingFinish = null
+        finish()
+      })
     })
+  }
+
+  /**
+   * Poll for auth cookies after OAuth popup closes.
+   * The login page may take a moment to process the OAuth result and set cookies.
+   */
+  private pollForAuth(): void {
+    let attempts = 0
+    const maxAttempts = 5
+    const intervalMs = 2000
+
+    const poll = async (): Promise<void> => {
+      attempts++
+      console.log(`[SessionManager] Polling for auth (attempt ${attempts}/${maxAttempts})...`)
+
+      const creds = await this.getFreshCredentials()
+      if (creds) {
+        console.log('[SessionManager] Auth cookies found after OAuth — login success')
+        setTimeout(() => {
+          if (this.loginWindow && !this.loginWindow.isDestroyed()) {
+            this.loginWindow.close()
+          }
+        }, 500)
+        if (this._pendingFinish) {
+          this._pendingFinish()
+          this._pendingFinish = null
+        }
+        return
+      }
+
+      if (attempts < maxAttempts) {
+        setTimeout(poll, intervalMs)
+      } else {
+        console.log('[SessionManager] Auth polling exhausted — user may need to complete login manually')
+      }
+    }
+
+    // Start polling after a short delay to let X process the OAuth result
+    setTimeout(poll, 1500)
   }
 
   /** Check if currently authenticated */

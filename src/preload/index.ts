@@ -7,6 +7,7 @@ const api: ElectronAPI = {
   // Auth
   checkAuth: () => ipcRenderer.invoke('auth:check'),
   openLogin: () => ipcRenderer.invoke('auth:login'),
+  logout: () => ipcRenderer.invoke('auth:logout'),
 
   // Fetch
   fetchUsers: (screenNames) => ipcRenderer.invoke('fetch:users', screenNames),

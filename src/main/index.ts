@@ -65,6 +65,11 @@ function registerIpcHandlers(): void {
     return result
   })
 
+  ipcMain.handle('auth:logout', async () => {
+    await sm.clearSession()
+    console.log('[Main] Session cleared — user logged out')
+  })
+
   // ===== Fetch =====
   ipcMain.handle('fetch:users', async (_, screenNames: string[]) => {
     return new Promise((resolve) => {

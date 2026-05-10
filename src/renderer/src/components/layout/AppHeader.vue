@@ -3,10 +3,10 @@ import { useAppStore } from '../../stores/app-store'
 import { useAuth } from '../../composables/useAuth'
 import ThemeToggle from '../ui/ThemeToggle.vue'
 import LoginButton from '../fetch/LoginButton.vue'
-import { Sparkles } from 'lucide-vue-next'
+import { Sparkles, LogOut } from 'lucide-vue-next'
 
 const store = useAppStore()
-const { login } = useAuth()
+const { login, logout } = useAuth()
 </script>
 
 <template>
@@ -52,6 +52,9 @@ const { login } = useAuth()
           />
           <span class="user-name">{{ store.currentUser.name }}</span>
         </div>
+        <button class="logout-btn" title="退出登录" @click="logout">
+          <LogOut :size="16" />
+        </button>
       </template>
       <template v-else>
         <LoginButton @login="login" />
@@ -172,5 +175,30 @@ const { login } = useAuth()
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full);
+  background: var(--bg-glass);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  transform: translateY(-1px);
+}
+
+.logout-btn:active {
+  transform: translateY(0) scale(0.95);
 }
 </style>
